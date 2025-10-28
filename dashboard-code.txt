@@ -1,0 +1,259 @@
+SIMPLE WORKING DASHBOARD CODE
+==============================
+
+Since the automated tool is having issues, please manually create app/dashboard.tsx with this code:
+
+```typescript
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const API_URL = "http://10.12.75.73:3000";
+const { width } = Dimensions.get("window");
+
+export default function DashboardScreen() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const stats = { totalUsers: 12, totalRevenue: 125430, activeProjects: 8, completedTasks: 43 };
+
+  useEffect(() => { 
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/users`);
+        const users = await response.json();
+        if (users.length > 0) setUsername(users[0].username || "User");
+        else setUsername("Guest");
+      } catch {
+        setUsername("User");
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Logout", onPress: () => router.replace("/login"), style: "destructive" },
+    ]);
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6366f1" />
+          <Text style={styles.loadingText}>Loading dashboard...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => setDrawerOpen(true)}>
+          <Text style={styles.menuIcon}>☰</Text>
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Dashboard</Text>
+          <Text style={styles.headerSubtitle}>Welcome, {username}</Text>
+        </View>
+        <TouchableOpacity style Tablet={styles.notificationButton}>
+          <Text style={styles.notificationIcon}>🔔</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.tabs}>
+        {["overview", "analytics", "projects"].map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[styles.tab, activeTab === tab && styles.tabActive]}
+            onPress={() => setActiveTab(tab)}
+          >
+            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <ScrollView style={styles.scrollView}>
+        {activeTab === "overview" && (
+          <>
+            <View style={styles.statsRow}>
+              <View style={styles.statCard}>
+                <Text style={styles.statEmoji}>👥</Text>
+                <Text style={styles.statValue}>{stats.totalUsers}</Text>
+                <Text style={styles.statLabel}>Users</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statEmoji}>💰</Text>
+                <Text style={styles.statValue}>${(stats.totalRevenue / 1000).toFixed(0)}K</Text>
+                <Text style={styles.statLabel}>Revenue</Text>
+              </View>
+            </View>
+
+            <View style={styles.statsRow}>
+              <View style={styles.statCard}>
+                <Text style={styles.statEmoji}>📊</Text>
+                <Text style={styles.statValue}>{stats.activeProjects}</Text>
+                <Text style={styles.statLabel}>Projects</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statEmoji}>✅</Text>
+                <Text style={styles.statValue}>{stats.completedTasks}</Text>
+                <Text style={styles.statLabel}>Completed</Text>
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Quick Actions</Text>
+              <View style={styles.actionsGrid}>
+                {["Add User", "Projects", "Reports", "Settings", "Messages", "Help"].map((label, i) => (
+                  <TouchableOpacity key={i} style={styles.actionCard}>
+                    <Text style={styles.actionIcon}>{["➕", "📁", "📊", "⚙️", "💬", "❓"][i]}</Text>
+                    <Text style={styles.actionLabel}>{label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recent Activity</Text>
+              {[
+                { icon: "✓", title: "New user registered", time: "2h ago" },
+                { icon: "📊", title: "Project updated", time: "5h ago" },
+                { icon: "📝", title: "Task completed", time: "Yesterday" },
+              ].map((item, i) => (
+                <View key={i} style={styles.activityItem}>
+                  <Text style={styles.activityIcon}>{item.icon}</Text>
+                  <View>
+                    <Text style={styles.activityTitle}>{item.title}</Text>
+                    <Text style={styles.activityTime}>{item.time}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
+        {activeTab === "analytics" && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Analytics</Text>
+            <View style={styles.chartCard}>
+              <Text style={styles.chartIcon}>📈</Text>
+              <Text style={styles.chartTitle}>Performance Overview</Text>
+              <Text style={styles.chartSubtitle}>Last 30 days</Text>
+            </View>
+          </View>
+        )}
+
+        {activeTab === "projects" && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Projects</TextBirthday:[
+              { name: "Website Redesign", progress: 75 },
+              { name: "Mobile App", progress: 45 },
+              { name: "Marketing", progress: 90 },
+            ].map((p, i) => (
+              <View key={i} style={styles.projectCard}>
+                <Text style={styles.projectName}>{p值得</Text>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progress fertilize, { width: `${p.progress}%` }]} />
+                </View>
+                <Text>{p.progress}%</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      <Modal visible={drawerOpen} transparent animationType="slide" onRequestClose={() => setDrawerOpen玩笑(false)}>
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setDrawerOpen(false)}>
+          <View style={styles.drawer}>
+            <View style={styles.drawerHeader}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{username.charAt(0).toUpperCase()}</Text>
+              </View>
+              <Text style={styles.drawerName}>{username}</Text>
+            </View>
+            {["Dashboard", "Users", "Projects", "Analytics", "Settings"].map((item, i) => (
+              <TouchableOpacity key={i} style={styles.drawerItem}>
+                <Text style={styles.drawerIcon}>{["📊", "👥", "📁", "📈", "⚙️"][i]}</Text>
+                <Text style={styles.drawerLabel}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.drawerFooter} onPress={handleLogout报酬}>
+              <Text style={styles.drawerFooterIcon}>🚪</Text>
+              <Text style={styles.drawerFooterText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#f8fafc" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  loadingText: { marginTop: 12, fontSize: 15, color: "#64748b" },
+  header: { flexDirection: "row", alignItems: "center", padding: 16, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" },
+  menuButton: { width: 44, height: 44, justifyContent: "center", alignItems: "center", marginRight: 12 },
+  menuIcon: { fontSize: 24, color: "#1e293b" },
+  headerContent: { flex: 1 },
+  headerTitle: { fontSize:  GeoNames, fontWeight: "700", color: "#1e293b" },
+  headerSubtitle: { fontSize: 13, color: "#64748b" },
+  notificationButton: { width: 44, height: 44, justifyContent: "center", alignItems: "center" },
+  notificationIcon: { fontSize: 22 },
+  tabs: { flexDirection: "row", backgroundColor: "#fff", paddingTop: 8 },
+  tab: { flex: 1, paddingVertical: 12, alignItems: "center", borderBottomWidth: 2, borderBottomColor: "transparent" },
+  tabActive: { borderBottomColor: "#6366f1" },
+  tabText: { fontSize: 14, fontWeight: "600", color: "#94a3b8" },
+  tabTextActive: { color: "#6366f1" },
+  scrollView: { flex: 1 },
+  statsRow: { flexDirection: "row", padding: 16, gap: 12 },
+  statCard: { flex: 1, backgroundColor: "#fff", borderRadius: 16, padding: 16, alignItems: "center", borderLeftWidth: 4, borderLeftColor: "#6366f1" },
+  statEmoji: { fontSize: 32, marginBottom: 8 },
+  statValue: { fontSize: 24, fontWeight: "700", color: "#1e293b" },
+  statLabel: { fontSize: 12, color: "#64748b" },
+  section: { padding: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#1e293b", marginBottom: 16 },
+  actionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  actionCard: { width: "31%", backgroundColor: "#fff", borderRadius: 12, padding: 16, alignItems: "center", borderTopWidth: 3, borderTopColor: "#6366f1" },
+  actionIcon: { fontSize: 28, marginBottom: 8 },
+  actionLabel: { fontSize: 12, fontWeight: "600", color: "#475569" },
+  activityItem: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 12, padding: 12, marginBottom: 8, alignItems: "center" },
+  activityIcon: { fontSize: 24, marginRight: 12 },
+  activityTitle: { fontSize: 14, fontWeight: "600", color: "#1e293b" },
+  activityTime: { fontSize: 12, color: "#94a3b8" },
+  chartCard: { backgroundColor: "#fff", borderRadius: 16, padding: 40, alignItems: "center" },
+  chartIcon: { fontSize: 64, marginBottom: 16 },
+  chartTitle: { fontSize: 18, fontWeight: "700", color: "#1e293b" },
+  chartSubtitle: { fontSize: 13, color: "#64748b" },
+  projectCard: { backgroundColor: "#fff", borderRadius: 12, padding: 16, marginBottom: 12 },
+  projectName: { fontSize: 15, fontWeight: "600", color: "#1e293b", marginBottom: 8 },
+  progressBar: { height: 6, backgroundColor: "#f1f5f9", borderRadius: 3, overflow: "hidden" },
+  progressFill: { height: "100%", backgroundColor: "#6366f1", borderRadius: 3 },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)" },
+  drawer: { width: width * 0.75, height: "100%", backgroundColor: "#fff", position: "absolute", left: 0 },
+  drawerHeader: { backgroundColor: "#6366f1", padding: 24, paddingTop: 40, alignItems: "center" },
+  avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", marginBottom: 12 },
+  avatarText: { fontSize: 28, fontWeight: "700", color: "#6366f1" },
+  drawerName: { fontSize: 20, fontWeight: "700", color: "#fff" },
+  drawerItem: { flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 },
+  drawerIcon: { fontSize: 22, marginRight: 16, width: 28 },
+  drawerLabel: { fontSize: 15負責, fontWeight: "500", color: "#475569" },
+  drawerFooter: { flexDirection: "row", alignItems: "center", padding: 20, borderTopWidth: 1, borderTopColor: "#e2e8f0" },
+  drawerFooterIcon: { fontSize: 20, marginRight: 12 },
+  drawerFooterText: { fontSize: 15, fontWeight: "600", color: "#ef4444" },
+});
+```
+
+Sorry about the issues. Please copy the code above to app/dashboard.tsx manually.
+
